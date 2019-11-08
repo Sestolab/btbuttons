@@ -213,7 +213,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								type: 'text',
 								label: 'id',
 								setup: function(element){
-									this.setValue(element.getAttribute('id') || '');
+									this.setValue(element.getId() || '');
 								},
 								commit: function(element){
 									if (this.getValue())
@@ -227,7 +227,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								type: 'text',
 								label: 'name',
 								setup: function(element){
-									this.setValue(element.getAttribute('name') || '');
+									this.setValue(element.getNameAtt() || '');
 								},
 								commit: function(element){
 									if (this.getValue())
