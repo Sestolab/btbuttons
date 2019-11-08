@@ -23,7 +23,7 @@ CKEDITOR.plugins.add('btbuttons', {
 			});
 
 			editor.contextMenu.addListener(function(element){
-				if (element.getAscendant({'button':1, 'a':1, 'input':1}, true))
+				if (element.is('button', 'a', 'input'))
 					return { btbuttonsItem: CKEDITOR.TRISTATE_OFF };
 			});
 		}

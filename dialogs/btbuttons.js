@@ -317,7 +317,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 						type: 'checkbox',
 						label: lang.inputTagLabel,
 						setup: function(element){
-						    this.setValue(element.hasAscendant('input', true));
+						    this.setValue(element.is('input'));
 						},
 						commit: function(element){
 							if (this.getDialog().getValueOf('tab-link', 'url'))
