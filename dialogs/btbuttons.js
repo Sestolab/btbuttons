@@ -16,9 +16,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 						required: true,
 						label: lang.txtLabel,
 						setup: function(element){
-							for (const child of element.getChildren().$)
-								if (child.nodeName == "#text")
-									return this.setValue(child.nodeValue);
+							this.setValue(element.getText().trim());
 						},
 						commit: function(element){
 							element.setText(this.getValue() || 'Button');
@@ -195,7 +193,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 						type: 'text',
 						label: lang.icon,
 						setup: function(element){
-							if (element.getFirst().hasAscendant('span', true))
+							if (element.getFirst().$.nodeName == 'SPAN')
 								this.setValue(element.getFirst().getAttribute('class'));
 						},
 						commit: function(element){
