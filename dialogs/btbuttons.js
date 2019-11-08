@@ -62,7 +62,6 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									[lang.btnN, ''],
 									[lang.btnLG, 'btn-lg']
 								],
-								default: '',
 								setup: function(element){
 									if(element.getAttribute('class'))
 										this.setValue(element.getAttribute('class').match(/btn-(lg|sm)/gm) || '');
@@ -81,7 +80,6 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									[lang.notSet, ''],
 									[lang.disabled, 'disabled']
 								],
-								default: '',
 								setup: function(element){
 									for(const state of this.items)
 										if (element.hasClass(state[1]) || element.hasAttribute(state[1]))
@@ -156,7 +154,6 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							[lang.targetSelf, '_self'],
 							[lang.targetParent, '_parent']
 						],
-						default: '',
 						setup: function(element){
 							this.setValue(element.getAttribute('target') || '');
 						},
