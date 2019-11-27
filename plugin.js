@@ -1,5 +1,5 @@
 CKEDITOR.plugins.add('btbuttons', {
-	requires: 'dialog',
+	requires: 'dialog,smethods',
 	lang: 'en,ru,uk',
 	icons: 'btbuttons',
 

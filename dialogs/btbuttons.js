@@ -1,5 +1,7 @@
 CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
-	var lang = editor.lang.btbuttons;
+	var lang = editor.lang.btbuttons,
+		style = /btn-[d-w].[^\s]+/g,
+		state = /active|disabled/;
 	return {
 		title: lang.title,
 		minWidth: 450,
@@ -8,7 +10,6 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 			{
 				id: 'tab-basic',
 				label: lang.tabBasic,
-
 				elements: [
 					{
 						id: 'txt',
@@ -42,15 +43,12 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								],
 								default: 'btn-primary',
 								setup: function(element){
-									var style = element.getAttribute('class');
-									if(style && style.match(/btn-[^\s]+/i))
-										this.setValue(style.match(/btn-[^\s]+/i)[0].replace('outline-', '') || 'btn-primary');
+									if(element.matchClass(style))
+										this.setValue(element.matchClass(style)[0].replace('outline-', '') || 'btn-primary');
 								},
 								commit: function(element){
-									if (this.getDialog().getValueOf('tab-basic', 'outline'))
-										element.setAttribute('class', 'btn ' + this.getValue().replace('-', '-outline-'));
-									else
-										element.setAttribute('class', 'btn ' + this.getValue());
+									if (!element.hasClass(this.getValue()))
+										element.toggleClass(this.getValue(), style);
 								}
 							},
 							{
@@ -63,12 +61,11 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									[lang.btnLG, 'btn-lg']
 								],
 								setup: function(element){
-									if(element.getAttribute('class'))
-										this.setValue(element.getAttribute('class').match(/btn-(lg|sm)/gm) || '');
+									this.setValue(element.matchClass(/btn-(lg|sm)/g) || '');
 								},
 								commit: function(element){
-									if (this.getValue())
-										element.addClass(this.getValue());
+									if (!element.hasClass(this.getValue()))
+										element.toggleClass(this.getValue(), /btn-(lg|sm)/g);
 								}
 							},
 							{
@@ -81,14 +78,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									[lang.disabled, 'disabled']
 								],
 								setup: function(element){
-									for(const state of this.items)
-										if (element.hasClass(state[1]) || element.hasAttribute(state[1]))
-											return this.setValue(state[1]);
-								},
-								commit: function(element){
-									element.removeAttributes(['disabled', 'active']);
-									if (this.getValue() && !element.hasAscendant('a', true))
-										element.setAttribute(this.getValue(), '');
+									this.setValue(element.matchAttribute(state) || element.matchClass(state) || '');
 								}
 							}
 						]
@@ -101,8 +91,11 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								type: 'checkbox',
 								label: lang.outlinelLabel,
 								setup: function(element){
-									if(element.getAttribute('class'))
-										this.setValue(element.getAttribute('class').match(/btn-outline-[^\s]+/i));
+									this.setValue(element.matchClass(/btn-outline-[^\s]+/));
+								},
+								commit: function(element){
+									if (this.getValue())
+										element.toggleClass(this.getDialog().getValueOf('tab-basic', 'style').replace('-', '-outline-'), style);
 								}
 							},
 							{
@@ -113,8 +106,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									this.setValue(element.hasClass('btn-block'));
 								},
 								commit: function(element){
-									if (this.getValue())
-										element.addClass('btn-block');
+									element.toggleClass((this.getValue() != element.hasClass('btn-block')) ? 'btn-block' : null);
 								}
 							}
 						]
@@ -137,7 +129,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							if (this.getValue()){
 								element.renameNode('a');
 								element.setAttributes({'href': this.getValue(), 'role': 'button'});
-								element.removeAttributes(['value', this.getDialog().getValueOf('tab-basic', 'state')]);
+								element.removeAttributes(['value', 'disabled', 'active']);
 								if (this.getDialog().getValueOf('tab-basic', 'state'))
 									element.addClass(this.getDialog().getValueOf('tab-basic', 'state'));
 							}
@@ -158,10 +150,8 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							this.setValue(element.getAttribute('target') || '');
 						},
 						commit: function(element){
-							if (this.getValue() && element.hasAscendant('a', true))
-								element.setAttribute('target', this.getValue());
-							else
-								element.removeAttribute('target');
+							if (element.is('a') && element.getAttribute('target') != (this.getValue() || null))
+								element.toggleAttribute('target', this.getValue());
 						}
 					},
 					{
@@ -172,10 +162,8 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							this.setValue(element.hasAttribute('download'));
 						},
 						commit: function(element){
-							if (this.getValue() && element.hasAscendant('a', true))
-								element.setAttribute('download', '');
-							else
-								element.removeAttribute('download');
+							if (element.is('a') && element.hasAttribute('download') != this.getValue())
+								element.toggleAttribute('download');
 						}
 					}
 				]
@@ -213,10 +201,8 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									this.setValue(element.getId() || '');
 								},
 								commit: function(element){
-									if (this.getValue())
-										element.setAttribute('id', this.getValue());
-									else
-										element.removeAttribute('id');
+									if (element.getId() != (this.getValue() || null))
+										element.toggleAttribute('id', this.getValue());
 								}
 							},
 							{
@@ -227,10 +213,8 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									this.setValue(element.getNameAtt() || '');
 								},
 								commit: function(element){
-									if (this.getValue())
-										element.setAttribute('name', this.getValue());
-									else
-										element.removeAttribute('name');
+									if (element.getNameAtt() != (this.getValue() || null))
+										element.toggleAttribute('name', this.getValue());
 								}
 							},
 							{
@@ -250,10 +234,8 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 									this.setValue(element.getAttribute('type') || 'button');
 								},
 								commit: function(element){
-									if (this.getValue() && !element.hasAscendant('a', true))
-										element.setAttribute('type', this.getValue());
-									else
-										element.removeAttribute('type');
+									if (element.getAttribute('type') != (this.getValue() || null))
+										element.toggleAttribute('type', this.getValue());
 								}
 							}
 						]
@@ -265,7 +247,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							{
 								id: 'event',
 								type: 'select',
-								widths: ["0", "100%"],
+								widths: ['0', '100%'],
 								labelLayout: 'horizontal',
 								items: [
 									['onchange'],
@@ -277,9 +259,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								],
 								default: 'onclick',
 								setup: function(element){
-									for (const e of this.items)
-										if (element.hasAttribute(e[0]))
-											return this.setValue(e[0]);
+									this.setValue(element.matchAttribute(new RegExp(this.getValues().join('|'))) || 'onclick');
 								},
 								onChange: function(){
 									this.getDialog().getContentElement('tab-advanced', 'evalue').setup(this.getDialog().element);
@@ -291,15 +271,14 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 								label: '=',
 								labelLayout: 'horizontal',
 								labelStyle: 'display:block;padding: 4px 6px;',
-								widths: ["1%", "99%"],
+								widths: ['1%', '99%'],
 								setup: function(element){
 									this.setValue(element.getAttribute(this.getDialog().getValueOf('tab-advanced', 'event')) || '');
 								},
 								commit: function(element){
-									if (this.getValue())
-										element.setAttribute(this.getDialog().getValueOf('tab-advanced', 'event'), this.getValue());
-									else
-										element.removeAttribute(this.getDialog().getValueOf('tab-advanced', 'event'));
+									var event = this.getDialog().getValueOf('tab-advanced', 'event');
+									if (element.getAttribute(event) != (this.getValue() || null))
+										element.toggleAttribute(event, this.getValue());
 								},
 								onChange: function(){
 									this.commit(this.getDialog().element);
@@ -318,19 +297,19 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 							if (this.getDialog().getValueOf('tab-link', 'url'))
 								return;
 							if (this.getValue()){
-						            element.renameNode('input');
-						            element.setAttribute('value', element.getText());
+						        element.renameNode('input');
+						        element.setAttribute('value', element.getText());
 						    }else{
-						            element.removeAttribute('value');
-						            element.renameNode('button');
+						        element.removeAttribute('value');
+						        element.renameNode('button');
 							}
-							element.removeAttributes(['href', 'role']);
+							element.rmClass(state).removeAttributes(['href', 'role', 'target', 'disabled', 'active']);
+							if (this.getDialog().getValueOf('tab-basic', 'state'))
+								element.setAttribute(this.getDialog().getValueOf('tab-basic', 'state'), '');
 						},
 						onChange: function(){
-							if (this.getValue())
-								this.getDialog().getContentElement('tab-advanced', 'icon').disable();
-							else
-								this.getDialog().getContentElement('tab-advanced', 'icon').enable();
+							if (this.hasFocus() || this.isChanged())
+								this.getDialog().getContentElement('tab-advanced', 'icon').toggleState();
 						}
 					}
 				]
@@ -352,6 +331,7 @@ CKEDITOR.dialog.add('btbuttonsDialog', function(editor){
 		},
 
 		onOk: function(){
+			this.element.toggleClass(!this.element.hasClass('btn') ? 'btn' : null);
 			this.commitContent(this.element);
 			if (this.insertMode)
 				editor.insertElement(this.element);
