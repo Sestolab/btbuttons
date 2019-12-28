@@ -32,5 +32,6 @@ CKEDITOR.plugins.setLang('btbuttons', 'uk', {
 	downloadLabel: 'Завантажити як файл',
 	tabAdvanced: 'Додаткове',
 	icon: 'Іконка',
-	inputTagLabel: 'Використовувати <input> замість <button>'
+	inputTagLabel: 'Використовувати <input> замість <button>',
+	remove: 'Видалити кнопку Bootstrap'
 });
